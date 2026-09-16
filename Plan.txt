@@ -84,8 +84,5 @@ Suggested build order (so it's never overwhelming)
     Add SaveManager with ofstream/ifstream
     Wrap it all in a menu loop in main.cpp
     Stretch goals: multiple enemy types, items/inventory, random encounters, colored terminal text
-
-Want me to actually write out the code for these files (starting with Character.h/.cpp and building up), or would you rather build it step by step yourself with me reviewing as you go?
-Write a message…
-
+    
 
