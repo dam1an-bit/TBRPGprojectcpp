@@ -1,0 +1,91 @@
+Project structure
+
+rpg/
+├── main.cpp
+├── Character.h / Character.cpp
+├── Player.h / Player.cpp
+├── Enemy.h / Enemy.cpp
+├── Battle.h / Battle.cpp
+├── SaveManager.h / SaveManager.cpp
+├── Item.h (optional, stretch goal)
+└── save.txt
+
+Splitting into .h/.cpp pairs is the "textbook" beginner pattern: header declares the class, .cpp implements it. Keeps compile times sane and teaches encapsulation.
+Core classes
+
+Character (base class)
+
+    Protected members: name, hp, maxHp, attack, defense, level
+    Virtual methods: takeDamage(int dmg), isAlive(), printStatus()
+    This is your shared foundation — both Player and Enemy inherit from it.
+
+Player : public Character
+
+    Extra members: exp, expToNextLevel, gold
+    Methods: gainExp(int amount), levelUp(), attackTarget(Character& target)
+    gainExp checks if exp crosses the threshold, calls levelUp(), which bumps stats and resets the exp bar (e.g. expToNextLevel *= 1.5)
+
+Enemy : public Character
+
+    Extra members: expReward, goldReward
+    Maybe a simple chooseAction() — for beginners, just "always attack" is fine; you can add randomness later with <cstdlib>
+
+Battle
+
+    Owns a Player& and Enemy& (or by value/copy, your choice)
+    runBattle() loop: show status → player picks action (attack/item/flee) → enemy responds → check win/lose conditions
+    On win: calls player.gainExp(enemy.expReward), adds gold
+
+SaveManager
+
+    Wraps fstream logic in one place so the rest of the code doesn't touch file I/O directly
+    bool saveGame(const Player& p, const std::string& filename) — writes stats to a text file with ofstream
+    bool loadGame(Player& p, const std::string& filename) — reads back with ifstream
+    Simple format works best for beginners: one value per line, or space-separated, parsed with >>
+
+Example save format:
+
+Hero
+100 100 15 5
+1
+0 100
+50
+
+(name / hp maxHp attack defense / level / exp expToNextLevel / gold)
+Game loop (main.cpp)
+
+    Show menu: New Game / Load Game / Quit
+    If load → SaveManager::loadGame()
+    Main loop: wander → random encounter chance → Battle → after battle, offer to save
+    On player death → game over screen, ask to load or quit
+
+Exp/leveling system logic
+
+gainExp(amount):
+    exp += amount
+    while exp >= expToNextLevel:
+        exp -= expToNextLevel
+        levelUp()
+
+levelUp():
+    level++
+    maxHp += 10
+    hp = maxHp        // full heal on level up feels good
+    attack += 3
+    defense += 2
+    expToNextLevel = expToNextLevel * 1.5  (as int)
+
+Suggested build order (so it's never overwhelming)
+
+    Character base class, print stats, compile it standalone
+    Player + Enemy inheriting from it, hardcode one of each in main
+    Battle class with a manual attack loop, no exp yet
+    Add exp/leveling to Player
+    Add SaveManager with ofstream/ifstream
+    Wrap it all in a menu loop in main.cpp
+    Stretch goals: multiple enemy types, items/inventory, random encounters, colored terminal text
+
+Want me to actually write out the code for these files (starting with Character.h/.cpp and building up), or would you rather build it step by step yourself with me reviewing as you go?
+Write a message…
+
+
